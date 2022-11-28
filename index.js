@@ -45,9 +45,9 @@ async function run() {
     try {
         const productOptionCollection = client.db('chafferResaleServer').collection('ProductOptions');
         const bookingsCollection = client.db('chafferResaleServer').collection('bookings');
+        const usersCollection = client.db('chafferResaleServer').collection('users');
 
 
-        // const usersCollection = client.db('doctorsPortal').collection('users');
         // const doctorsCollection = client.db('doctorsPortal').collection('doctors');
         // const paymentsCollection = client.db('doctorsPortal').collection('payments');
         // //note: make sure you use verify admin after verifyjwt
@@ -143,16 +143,17 @@ async function run() {
         //     res.send(result)
         // })
 
-        // app.get('/bookings', verifyJWT, async (req, res) => {
-        //     const email = req.query.email;
-        //     const decodedEmail = req.decoded.email;
-        //     if (email !== decodedEmail) {
-        //         return res.status(403).send({ message: 'forbidden access' })
-        //     }
-        //     const query = { email: email };
-        //     const bookings = await bookingsCollection.find(query).toArray();
-        //     res.send(bookings);
-        // })
+        app.get('/bookings', async (req, res) => {
+            const email = req.query.email;
+            console.log(email)
+            //     const decodedEmail = req.decoded.email;
+            //     if (email !== decodedEmail) {
+            //         return res.status(403).send({ message: 'forbidden access' })
+            //     }
+            const query = { email: email };
+            const bookings = await bookingsCollection.find(query).toArray();
+            res.send(bookings);
+        })
 
         // app.get('/bookings/:id', async (req, res) => {
         //     const id = req.params.id;
@@ -241,11 +242,11 @@ async function run() {
 
 
 
-        // app.post('/users', async (req, res) => {
-        //     const user = req.body;
-        //     const result = await usersCollection.insertOne(user);
-        //     res.send(result);
-        // })
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+        })
 
         // app.put('/users/admin/:id', verifyJWT, verifyAdmin, async (req, res) => {
         //     const id = req.params.id;
