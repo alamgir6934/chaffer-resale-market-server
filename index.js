@@ -229,17 +229,17 @@ async function run() {
             console.log(user);
             res.send({ accessToken: '' })
         })
-        // app.get('/users', async (req, res) => {
-        //     const query = {};
-        //     const users = await usersCollection.find(query).toArray();
-        //     res.send(users);
-        // })
-        // app.get('/users/admin/:email', async (req, res) => {
-        //     const email = req.params.email;
-        //     const query = { email }
-        //     const user = await usersCollection.findOne(query);
-        //     res.send({ isAdmin: user?.role === 'admin' });
-        // })
+        app.get('/users', async (req, res) => {
+            const query = {};
+            const users = await usersCollection.find(query).toArray();
+            res.send(users);
+        })
+        app.get('/users/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isAdmin: user?.role === 'admin' });
+        })
 
 
 
@@ -248,19 +248,34 @@ async function run() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         })
-
-        // app.put('/users/admin/:id', verifyJWT, verifyAdmin, async (req, res) => {
+        //user admin
+        app.put('/users/admin/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
+        //user seller
+        // app.put('/users/seller/:id', async (req, res) => {
         //     const id = req.params.id;
         //     const filter = { _id: ObjectId(id) }
         //     const options = { upsert: true };
         //     const updateDoc = {
         //         $set: {
-        //             role: 'admin'
+        //             role: 'seller'
         //         }
         //     }
         //     const result = await usersCollection.updateOne(filter, updateDoc, options);
         //     res.send(result);
+
         // })
+
 
         //temporary to update price field on appointment options
 
