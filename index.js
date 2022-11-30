@@ -52,17 +52,17 @@ async function run() {
         // const paymentsCollection = client.db('doctorsPortal').collection('payments');
         // //note: make sure you use verify admin after verifyjwt
 
-        // const verifyAdmin = async (req, res, next) => {
-        //     // console.log('inside verifyAdmin', req.decoded.email)
-        //     const decodedEmail = req.decoded.email;
-        //     const query = { email: decodedEmail };
-        //     const user = await usersCollection.findOne(query);
+        const verifyAdmin = async (req, res, next) => {
+            // console.log('inside verifyAdmin', req.decoded.email)
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
 
-        //     if (user?.role !== 'admin') {
-        //         return res.status(403).send({ message: 'forbidden access' })
-        //     }
-        //     next();
-        // }
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next();
+        }
 
         //use aggregate to query multiple collection and then merge date
         app.get('/ProductOptions', async (req, res) => {
@@ -146,7 +146,6 @@ async function run() {
 
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
-            console.log(email)
             const decodedEmail = req.decoded.email;
             if (email !== decodedEmail) {
                 return res.status(403).send({ message: 'forbidden access' })
@@ -222,7 +221,7 @@ async function run() {
             const query = { email: email };
             const user = await usersCollection.findOne(query);
             if (user) {
-                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '1h' })
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '2h' })
                 return res.status(403).send({ accessToken: token });
             }
 
@@ -240,6 +239,7 @@ async function run() {
             const user = await usersCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'admin' });
         })
+
 
 
 
