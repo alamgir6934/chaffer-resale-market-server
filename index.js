@@ -138,11 +138,11 @@ async function run() {
 
 
 
-        // app.get('/appointmentSpecialty', async (req, res) => {
-        //     const query = {}
-        //     const result = await appointmentOptionCollection.find(query).project({ name: 1 }).toArray();
-        //     res.send(result)
-        // })
+        app.get('/productSpecialty', async (req, res) => {
+            const query = {}
+            const result = await productOptionCollection.find(query).project({ title: 1 }).toArray();
+            res.send(result)
+        })
 
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
@@ -233,14 +233,29 @@ async function run() {
             const users = await usersCollection.find(query).toArray();
             res.send(users);
         })
+        //check user admin or not
         app.get('/users/admin/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'admin' });
         })
+        //check user seller or not
 
+        app.get('/users/saller/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isSaller: user?.role === 'saller' });
+        })
 
+        //check buyer or not
+        app.get('/users/buyer/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isBuyer: user?.role === 'buyer' });
+        })
 
 
         app.post('/users', async (req, res) => {
@@ -261,20 +276,7 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         })
-        //user seller
-        // app.put('/users/seller/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const filter = { _id: ObjectId(id) }
-        //     const options = { upsert: true };
-        //     const updateDoc = {
-        //         $set: {
-        //             role: 'seller'
-        //         }
-        //     }
-        //     const result = await usersCollection.updateOne(filter, updateDoc, options);
-        //     res.send(result);
 
-        // })
 
 
         //temporary to update price field on appointment options
