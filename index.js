@@ -46,6 +46,7 @@ async function run() {
         const productOptionCollection = client.db('chafferResaleServer').collection('ProductOptions');
         const bookingsCollection = client.db('chafferResaleServer').collection('bookings');
         const usersCollection = client.db('chafferResaleServer').collection('users');
+        const productsCollection = client.db('chafferResaleServer').collection('newProducts');
 
 
         // const doctorsCollection = client.db('doctorsPortal').collection('doctors');
@@ -59,6 +60,18 @@ async function run() {
             const user = await usersCollection.findOne(query);
 
             if (user?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next();
+        }
+        //saller verify
+        const verifySaller = async (req, res, next) => {
+            // console.log('inside verifyAdmin', req.decoded.email)
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+            if (user?.role !== 'saller') {
                 return res.status(403).send({ message: 'forbidden access' })
             }
             next();
@@ -294,24 +307,24 @@ async function run() {
 
         // })
 
-        // app.get('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
-        //     const query = {};
-        //     const doctors = await doctorsCollection.find(query).toArray();
-        //     res.send(doctors)
-        // })
+        app.get('/newProducts', verifyJWT, verifySaller, async (req, res) => {
+            const query = {};
+            const products = await productsCollection.find(query).toArray();
+            res.send(products)
+        })
 
 
-        // app.post('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
-        //     const doctor = req.body;
-        //     const result = await doctorsCollection.insertOne(doctor);
-        //     res.send(result)
-        // })
-        // app.delete('/doctors/:id', verifyJWT, verifyAdmin, async (req, res) => {
-        //     const id = req.params.id;
-        //     const filter = { _id: ObjectId(id) };
-        //     const result = await doctorsCollection.deleteOne(filter);
-        //     res.send(result)
-        // })
+        app.post('/newProducts', verifyJWT, async (req, res) => {
+            const saller = req.body;
+            const result = await productsCollection.insertOne(saller);
+            res.send(result)
+        })
+        app.delete('/newProducts/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(filter);
+            res.send(result)
+        })
 
 
 
