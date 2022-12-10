@@ -28,12 +28,16 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
+
     if (!authHeader) {
         return res.status(401).send('unauthorized access')
     }
     const token = authHeader.split(' ')[1];
+
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+        console.log(err)
         if (err) {
+            console.log('verify jwt')
             return res.status(403).send({ message: 'forbidden access' })
         }
         req.decoded = decoded;
@@ -65,10 +69,14 @@ async function run() {
         const verifySaller = async (req, res, next) => {
             // console.log('inside verifyAdmin', req.decoded.email)
             const decodedEmail = req.decoded.email;
+            console.log(decodedEmail)
             const query = { email: decodedEmail };
+            console.log(query)
             const user = await usersCollection.findOne(query);
+            console.log(user)
 
             if (user?.role !== 'saller') {
+                console.log('if blog')
                 return res.status(403).send({ message: 'forbidden access' })
             }
             next();
@@ -311,12 +319,12 @@ async function run() {
         })
 
 
-        app.post('/newProducts', verifyJWT, async (req, res) => {
+        app.post('/newProducts', verifyJWT, verifySaller, async (req, res) => {
             const saller = req.body;
             const result = await productsCollection.insertOne(saller);
             res.send(result)
         })
-        app.delete('/newProducts/:id', async (req, res) => {
+        app.delete('/newProducts/:id', verifySaller, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await productsCollection.deleteOne(filter);
